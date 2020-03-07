@@ -1,9 +1,9 @@
 import HttpException from './http-exception';
 
-class AuthenticationTokenMissingException extends HttpException {
+class NotAuthorizedException extends HttpException {
   constructor() {
-    super(401, 'Authentication token missing');
+    super(403, "You're not authorized");
   }
 }
 
-export default AuthenticationTokenMissingException;
+export default NotAuthorizedException;

@@ -1,6 +1,7 @@
 import * as express from 'express';
 import Post from './post.interface';
 import postModel from './posts.model';
+import userModel from '../users/user.model';
 import PostNotFoundException from '../exceptions/PostNotFoundException';
 import RequestWithUser from '../interfaces/requestWithUser.interface';
 import validationMiddleware from '../middleware/validation.middleware';
@@ -11,7 +12,7 @@ class PostsController {
   public path = '/posts';
   public router = express.Router();
   private post = postModel;
- 
+ private user = userModel;
   constructor() {
     this.intializeRoutes();
   }
@@ -27,8 +28,9 @@ class PostsController {
   }
  
   getAllPosts = async(request: express.Request, response: express.Response) => {
-    const posts = await this.post.find().exec();
-    response.send(posts);
+    const posts = await this.post.find()
+    .populate('author', '-password');
+   response.send(posts);
   }
  
   private getPostById = (request: express.Request, response: express.Response, next: express.NextFunction) => {
@@ -69,9 +71,16 @@ class PostsController {
   }
    
   private createPost = async (request: RequestWithUser, response: express.Response) => {
-    const postData: Post = request.body;
-    const createdPost = new this.post({...postData, authorId: request.user._id});
+    const postData: CreatePostDto = request.body;
+    const createdPost = new this.post({
+      ...postData,
+      authors: [request.user._id],
+    });
+    const user:any = await this.user.findById(request.user._id);
+    user.posts = [...user.posts, createdPost._id];
+    await user.save();
     const savedPost = await createdPost.save();
+    await savedPost.populate('authors', '-password').execPopulate();
     response.send(savedPost);
   }
 

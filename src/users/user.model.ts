@@ -17,6 +17,12 @@ const addressSchema = new mongoose.Schema({
         type: String,
         get: (): undefined => undefined,
       },
+      posts: [
+        {
+          ref: 'Post',
+          type: mongoose.Schema.Types.ObjectId,
+        },
+      ],
     },
     {
       toJSON: {
