@@ -3,6 +3,7 @@ import * as mongoose from 'mongoose';
 import * as bodyParser from 'body-parser';
 import {loggerMiddleware} from './middleware/logger.middleware'
 import {errorMiddlware} from './middleware/error.middleware';
+import * as cookieParser from 'cookie-parser'; 
 
 
 class App {
@@ -20,7 +21,8 @@ class App {
     private initializeMiddlewares() {
       this.app.use(bodyParser.json());
       this.app.use(loggerMiddleware);
-      this.app.use(errorMiddlware)
+      this.app.use(errorMiddlware);
+      this.app.use(cookieParser());
     }
    
     private initializeControllers(controllers) {
